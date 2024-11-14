@@ -7,7 +7,6 @@ import cat.itacademy.s04.t02.n01.repository.FruitRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class FruitServiceImpl implements FruitService {
@@ -20,7 +19,9 @@ public class FruitServiceImpl implements FruitService {
 
     @Override
     public Fruit addFruit(Fruit fruit){
-        if (fruitRepository.existsByName(fruit.getName())) throw new FruitAlreadyExistsException("Fruit already exists");
+        if (fruitRepository.existsByName(fruit.getName())) {
+            throw new FruitAlreadyExistsException("Fruit already exists");
+        }
         return fruitRepository.save(fruit);
     }
 
@@ -31,21 +32,20 @@ public class FruitServiceImpl implements FruitService {
 
     @Override
     public Fruit getFruitById(Long id){
-        Optional<Fruit> fruitOptional = fruitRepository.findById(id);
-        return fruitOptional.orElseThrow(() -> new EntityNotFoundException("No fruit found with id "+ id));
+        return fruitRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No fruit found with id "+ id));
     }
 
     @Override
     public void deleteFruitById(Long id){
-        Optional<Fruit> fruit = fruitRepository.findById(id);
-        fruit.orElseThrow(() -> new EntityNotFoundException("No fruit found with id "+ id));
+        fruitRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No fruit found with id "+ id));
         fruitRepository.deleteById(id);
     }
 
     @Override
     public Fruit updateFruit(Fruit fruit){
-        Fruit oldFruit = fruitRepository.findByName(fruit.getName()).orElseThrow(
-                () -> new EntityNotFoundException("No fruit found with name "+ fruit.getName()));
+        Fruit oldFruit = fruitRepository.findByName(fruit.getName())
+                .orElseThrow(() -> new EntityNotFoundException("No fruit found with name "+ fruit.getName()));
         fruit.setId(oldFruit.getId());
         return fruitRepository.save(fruit);
     }
